@@ -6,11 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  HttpStatus,
 } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 
 @Controller('user')
 @ApiTags('用户管理')
@@ -22,6 +28,11 @@ export class UserController {
     summary: '新增用户',
   })
   @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: CreateUserDto,
+    description: '创建成功',
+  })
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto)
   }
