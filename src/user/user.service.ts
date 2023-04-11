@@ -1,22 +1,25 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { SharedService } from '../shared/shared.service'
 import { ConfigService } from '@nestjs/config'
+import { MongoRepository } from 'typeorm'
+import { User } from './entities/user.mongo.entity'
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly SharedService: SharedService,
     private readonly ConfigService: ConfigService,
+    @Inject('USER_REPOSITORY')
+    private readonly userRepository: MongoRepository<User>,
   ) {}
-  create(createUserDto: CreateUserDto) {
-    console.log(this.ConfigService.get<string>('database.name'))
-    return 'This action adds a new user'
+  create(user) {
+    return this.userRepository.save(user)
   }
 
   findAll() {
-    return `This action returns all user`
+    return this.userRepository.findAndCount()
   }
 
   findOne(id: number) {
