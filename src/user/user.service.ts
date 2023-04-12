@@ -5,6 +5,7 @@ import { SharedService } from '../shared/shared.service'
 import { ConfigService } from '@nestjs/config'
 import { MongoRepository } from 'typeorm'
 import { User } from './entities/user.mongo.entity'
+import { AppLogger } from '../shared/logger/logger.services'
 
 @Injectable()
 export class UserService {
@@ -13,8 +14,13 @@ export class UserService {
     private readonly ConfigService: ConfigService,
     @Inject('USER_REPOSITORY')
     private readonly userRepository: MongoRepository<User>,
-  ) {}
+    private readonly logger: AppLogger,
+  ) {
+    this.logger.setContext(new.target.name)
+  }
   create(user) {
+    this.logger.log(null, 'created...🚀', {})
+    this.logger.debug(null, 'debug:created...🚀', {})
     return this.userRepository.save(user)
   }
 
