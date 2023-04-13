@@ -1,10 +1,8 @@
-import { ObjectIdColumn, Column, ObjectID, Entity } from 'typeorm'
+import { Column, Entity } from 'typeorm'
+import { Common } from './common.mongo.entity'
 
 @Entity()
-export class User {
-  @ObjectIdColumn()
-  _id: ObjectID
-
+export class User extends Common {
   @Column('text')
   name: string
 
