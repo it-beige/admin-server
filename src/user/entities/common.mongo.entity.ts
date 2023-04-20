@@ -14,10 +14,10 @@ export abstract class Common {
   _id: ObjectID
 
   @CreateDateColumn()
-  createAt: string
+  createdAt: string
 
   @UpdateDateColumn()
-  updateAt: string
+  updatedAt: string
 
   /* 
     @Column() 装饰器用于指定实体类中对应的列的属性，它支持多种配置，以下是一些常用的配置：

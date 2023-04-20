@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { CreateUserDto } from '../dtos/create-user.dto'
 import { UpdateUserDto } from '../dtos/update-user.dto'
 import { SharedService } from '../../shared/shared.service'
 import { ConfigService } from '@nestjs/config'
@@ -28,8 +27,6 @@ export class UserService {
     update: 更新数据库中一个已存在的 User 实例的属性值。
   */
   create(user) {
-    this.logger.log(null, 'created...🚀', {})
-    this.logger.debug(null, 'debug:created...🚀', {})
     return this.userRepository.save(user)
   }
 
@@ -47,7 +44,7 @@ export class UserService {
 
     */
     return this.userRepository.findAndCount({
-      order: { name: 'DESC' },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * pageSize,
       take: pageSize * 1,
       cache: true,

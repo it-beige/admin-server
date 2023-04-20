@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator'
+import { IdDto } from 'src/shared/dtos/id.tdo'
 
 export class CreateUserDto {
   /**
@@ -21,4 +22,6 @@ export class CreateUserDto {
   @ApiProperty({ example: 'it_beige@163.com' })
   @IsEmail({}, { message: '请输入正确的电子邮件地址' })
   email: string
+
+  salt: string
 }
