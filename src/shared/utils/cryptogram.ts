@@ -29,3 +29,13 @@ export function generatePassWord(salt: string, password: string) {
     .pbkdf2Sync(password, salt, 1000 * 10, 16, 'sha1')
     .toString('base64')
 }
+
+/**
+ * @description: 根据文件二进制流进行md5加密
+ * @param {Buffer} buffer
+ * @return {*}
+ */
+export function encryptFileMD5(buffer: Buffer): string {
+  const md5 = crypto.createHash('md5')
+  return md5.update(buffer).digest('hex')
+}

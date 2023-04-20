@@ -27,7 +27,11 @@ import {
   SwaggerBaseApiResponse,
 } from '../../shared/dtos/base-api-reponse.dto'
 import { PaginationParamsDto } from '../../shared/dtos/pagination-params.dto'
-import { generatePassWord, makeSalt } from '../../shared/utils/cryptogram'
+import {
+  encryptFileMD5,
+  generatePassWord,
+  makeSalt,
+} from '../../shared/utils/cryptogram'
 import { UploadDto } from '../dtos/upload.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 
@@ -120,6 +124,8 @@ export class UserController {
     @UploadedFile() file,
   ): Promise<any> {
     console.log(file)
+    const hash = encryptFileMD5(file.buffer)
+    console.log(hash)
     return Promise.resolve('1')
   }
 }
