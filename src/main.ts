@@ -3,11 +3,17 @@ import { AppModule } from './app.module'
 import { generateDocument } from './doc'
 import { ValidationPipe } from '@nestjs/common'
 import { NestExpressApplication } from '@nestjs/platform-express'
+import { getUploadDir } from './shared/utils/upload'
 
 async function bootstrap() {
   // 修改运行平台
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
 
+  // 静态服务
+  const uploadDir = getUploadDir(process.env.UPLOAD_PATH)
+  app.useStaticAssets(uploadDir, {
+    prefix: '/static/upload',
+  })
   // 允许不能识别的值
   app.useGlobalPipes(
     new ValidationPipe({

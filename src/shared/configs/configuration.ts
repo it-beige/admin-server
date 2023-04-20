@@ -12,4 +12,7 @@ export default (): any => ({
   logger: {
     level: process.env.LOGGER_LEVEL,
   },
+  upload: {
+    path: process.env.UPLOAD_PATH,
+  },
 })

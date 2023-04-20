@@ -1,3 +1,4 @@
+import { UploadService } from './upload.service'
 import { Inject, Injectable } from '@nestjs/common'
 import { UpdateUserDto } from '../dtos/update-user.dto'
 import { SharedService } from '../../shared/shared.service'
@@ -15,6 +16,7 @@ export class UserService {
     @Inject('USER_REPOSITORY')
     private readonly userRepository: MongoRepository<User>,
     private readonly logger: AppLogger,
+    private readonly uploadService: UploadService,
   ) {
     this.logger.setContext(new.target.name)
   }
@@ -61,5 +63,9 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} user`
+  }
+
+  uploadAvatar(file) {
+    return this.uploadService.upload(file)
   }
 }

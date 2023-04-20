@@ -121,11 +121,8 @@ export class UserController {
   upload(
     @Req() req: any,
     @Body() upload: UploadDto,
-    @UploadedFile() file,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<any> {
-    console.log(file)
-    const hash = encryptFileMD5(file.buffer)
-    console.log(hash)
-    return Promise.resolve('1')
+    return this.userService.uploadAvatar(file)
   }
 }

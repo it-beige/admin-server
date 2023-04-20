@@ -1,5 +1,10 @@
 import { User } from './entities/user.mongo.entity'
 import { Role } from './entities/role.mongo.entity'
+import { ConfigService } from '@nestjs/config'
+
+export type UPLOAD_TYPE = {
+  path: string
+}
 
 export const UserProviders = [
   {
@@ -13,5 +18,14 @@ export const UserProviders = [
     useFactory: async (AppDataSource) =>
       await AppDataSource.getRepository(Role),
     inject: ['MONGODB_DATA_SOURCE'],
+  },
+  {
+    provide: 'UPLOAD_REPOSITORY',
+    inject: [ConfigService],
+    useFactory: async (configService: ConfigService) => {
+      return {
+        path: configService.get('upload.path'),
+      }
+    },
   },
 ]
