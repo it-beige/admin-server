@@ -9,5 +9,5 @@ export class Role extends Common {
   name: string
 
   @Column('')
-  permission: object
+  permissions: object
 }

@@ -18,5 +18,5 @@ export class createRoleDto {
     },
   })
   @IsNotEmpty()
-  permission: object
+  permissions: object
 }

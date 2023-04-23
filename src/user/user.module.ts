@@ -6,11 +6,30 @@ import { UserProviders } from './user.providers'
 import { RoleController } from './controllers/role.controller'
 import { RoleService } from './services/role.service'
 import { UploadService } from './services/upload.service'
+import { JwtModule } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { AuthController } from './controllers/auth.controller'
+import { AuthService } from './services/auth.service'
+import { JwtStrategy } from './strategies/jwt.strategy'
 
 @Module({
-  imports: [SharedModule],
-  controllers: [UserController, RoleController],
-  providers: [UserService, RoleService, ...UserProviders, UploadService],
+  imports: [
+    SharedModule,
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      imports: [SharedModule],
+      useFactory: (configService: ConfigService) => configService.get('jwt'),
+    }),
+  ],
+  controllers: [UserController, RoleController, AuthController],
+  providers: [
+    UserService,
+    RoleService,
+    ...UserProviders,
+    UploadService,
+    AuthService,
+    JwtStrategy,
+  ],
   exports: [UploadService],
 })
 export class UserModule {}

@@ -42,7 +42,7 @@ export class UserController {
 
   private getPassword(password) {
     const salt = makeSalt() // 制作密码盐
-    const hashPassword = generatePassWord(password, salt) // 加密密码
+    const hashPassword = generatePassWord(salt, password) // 加密密码
     return { salt, hashPassword }
   }
 
@@ -62,6 +62,7 @@ export class UserController {
   @Post('')
   create(@Body() user: CreateUserDto) {
     if (user.password) {
+      console.log(user.password)
       const { salt, hashPassword } = this.getPassword(user.password)
       user.salt = salt
       user.password = hashPassword

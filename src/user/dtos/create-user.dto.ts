@@ -6,7 +6,7 @@ export class CreateUserDto {
   /**
    * 手机号（系统唯一）
    */
-  @ApiProperty({ example: '18870912192' })
+  @ApiProperty({ example: '16666666666' })
   @Matches(/^1\d{10}$/g, { message: 'phoneNumber error' })
   readonly phoneNumber: string
 
@@ -24,4 +24,7 @@ export class CreateUserDto {
   email: string
 
   salt: string
+
+  @ApiProperty({})
+  role?
 }

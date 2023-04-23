@@ -25,8 +25,9 @@ export function generatePassWord(salt: string, password: string) {
     keylen：生成的密钥长度，以字节为单位。apap
     digest：使用的摘要算法。
   */
+  const tempSalt = Buffer.from(salt, 'base64')
   return crypto
-    .pbkdf2Sync(password, salt, 1000 * 10, 16, 'sha1')
+    .pbkdf2Sync(password, tempSalt, 1000 * 10, 16, 'sha1')
     .toString('base64')
 }
 
