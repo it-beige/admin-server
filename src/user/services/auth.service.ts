@@ -48,7 +48,6 @@ export class AuthService {
   async login(login: LoginDto) {
     const user = await this.checkUserValidity(login)
     const token = await this.certificate(user)
-    console.log(token)
     return {
       data: token,
     }

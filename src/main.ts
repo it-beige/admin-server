@@ -4,6 +4,10 @@ import { generateDocument } from './doc'
 import { ValidationPipe } from '@nestjs/common'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { getUploadDir } from './shared/utils/upload'
+import {
+  RemoveSensitiveInterceptor,
+  RemoveSensitiveUrls,
+} from './shared/interceptors/remove-sensitive.interceptor'
 
 async function bootstrap() {
   // 修改运行平台
@@ -22,6 +26,10 @@ async function bootstrap() {
   )
   // 添加全局管道
   app.useGlobalPipes(new ValidationPipe())
+
+  // 使用全局拦截器处理敏感数据
+  app.useGlobalInterceptors(new RemoveSensitiveInterceptor(RemoveSensitiveUrls))
+
   // 生成swagger文档
   generateDocument(app)
   await app.listen(3000)
