@@ -20,7 +20,7 @@ import {
   SwaggerBaseApiResponse,
 } from '../../shared/dtos/base-api-reponse.dto'
 import { AuthGuard } from '@nestjs/passport'
-import { UserInfoDto } from '../dtos/auth.dto'
+import { RegisterCodeDTO, UserInfoDto } from '../dtos/auth.dto'
 
 @ApiTags('认证鉴权')
 @Controller()
@@ -62,5 +62,41 @@ export class AuthController {
     return {
       data,
     }
+  }
+
+  @ApiOperation({
+    summary: '短信验证码',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: SwaggerBaseApiResponse([UserInfoDto]),
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    type: BaseApiErrorResponse,
+  })
+  @Post('registerCode')
+  async registerCode(@Body() registerCode: RegisterCodeDTO) {
+    const code = await this.authService.registerCode(registerCode)
+    return {
+      msg: '验证码已发送',
+      data: { code },
+    }
+  }
+
+  @ApiOperation({
+    summary: '获取图形验证码',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    type: BaseApiErrorResponse,
+  })
+  @Get('catpcha')
+  async getCaptcha() {
+    const data = await this.authService.getCaptcha()
+    return data 
   }
 }

@@ -39,7 +39,7 @@ export class RegisterCodeDTO {
   @ApiProperty({ example: 'GaBUGhJzESU=' })
   readonly captchaId: string
 
-  @IsNotEmpty({ message: '请输入手机号' })
+  @IsNotEmpty({ message: '请输入验证码' })
   @ApiProperty({ example: '0000' })
   readonly captchaCode: string
 }

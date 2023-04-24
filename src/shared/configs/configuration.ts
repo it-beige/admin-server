@@ -21,4 +21,7 @@ export default (): any => ({
       expiresIn: process.env.JWT_EXPIRES_IN,
     },
   },
+  redis: {
+    url: process.env.REDIS_URL,
+  },
 })
