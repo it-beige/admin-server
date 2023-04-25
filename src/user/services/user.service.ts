@@ -1,6 +1,5 @@
 import { UploadService } from './upload.service'
 import { Inject, Injectable } from '@nestjs/common'
-import { UpdateUserDto } from '../dtos/update-user.dto'
 import { SharedService } from '../../shared/shared.service'
 import { ConfigService } from '@nestjs/config'
 import { MongoRepository } from 'typeorm'
@@ -8,6 +7,8 @@ import { User } from '../entities/user.mongo.entity'
 import { AppLogger } from '../../shared/logger/logger.services'
 import { PaginationParamsDto } from '../../shared/dtos/pagination-params.dto'
 import { generatePassWord, makeSalt } from '@/shared/utils/cryptogram'
+import { Role } from '../entities/role.mongo.entity'
+import { UpdateUserDto } from '../dtos/user.dto'
 
 @Injectable()
 export class UserService {
@@ -16,6 +17,8 @@ export class UserService {
     private readonly ConfigService: ConfigService,
     @Inject('USER_REPOSITORY')
     private readonly userRepository: MongoRepository<User>,
+    @Inject('ROLE_REPOSITORY')
+    private readonly roleRepository: MongoRepository<Role>,
     private readonly logger: AppLogger,
     private readonly uploadService: UploadService,
   ) {
@@ -45,7 +48,15 @@ export class UserService {
     return this.userRepository.save(user)
   }
 
-  findAll({ page, pageSize }: PaginationParamsDto) {
+  async getRole(user) {
+    const roles = await this.roleRepository.findBy({})
+    return roles.find((role) => '' + user.role === '' + role._id)
+  }
+
+  async findAll({
+    page,
+    pageSize,
+  }: PaginationParamsDto): Promise<{ data: User[]; count: number }> {
     // https://typeorm.io/#/find-options
     // findAndCount(options?: FindManyOptions<Entity>): Promise<[Entity[], number]>
     /* 
@@ -58,16 +69,31 @@ export class UserService {
       select: 指定查询的字段（属性）列表，例如 [ 'name', 'age' ] 表示只查询 name 和 age 字段。
 
     */
-    return this.userRepository.findAndCount({
+    const [data, count] = await this.userRepository.findAndCount({
       order: { createdAt: 'DESC' },
       skip: (page - 1) * pageSize,
       take: pageSize * 1,
       cache: true,
     })
+
+    for (const user of data) {
+      const role = await this.getRole(user)
+      if (role) {
+        user['roleData'] = role
+      }
+    }
+    return {
+      data,
+      count,
+    }
   }
 
-  findOne(id: string) {
-    return `This action returns a 🚀#${id} user`
+  async findOne(id: string) {
+    const entity = await this.userRepository.findOneBy(id)
+    if (entity.role) {
+      entity['roleData'] = await this.getRole(entity)
+    }
+    return { ...entity, _id: entity._id.toHexString() }
   }
 
   async update(id: string, user: UpdateUserDto) {
@@ -86,11 +112,15 @@ export class UserService {
     return await this.userRepository.update(id, user)
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} user`
+  async remove(id: string) {
+    return await this.userRepository.delete(id)
   }
 
-  uploadAvatar(file) {
-    return this.uploadService.upload(file)
+  /**
+   * 上传头像
+   */
+  async uploadAvatar(file) {
+    const { url } = await this.uploadService.upload(file)
+    return { data: url }
   }
 }

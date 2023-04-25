@@ -29,7 +29,7 @@ export class RoleController {
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    type: SwaggerBaseApiResponse(BaseApiResponse),
+    type: SwaggerBaseApiResponse(createRoleDto),
     description: '创建成功',
   })
   @ApiResponse({
@@ -70,7 +70,7 @@ export class RoleController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: SwaggerBaseApiResponse([createRoleDto]),
+    type: SwaggerBaseApiResponse(createRoleDto),
     description: '查找成功',
   })
   @ApiResponse({
@@ -90,7 +90,7 @@ export class RoleController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: SwaggerBaseApiResponse([createRoleDto]),
+    type: SwaggerBaseApiResponse(createRoleDto),
     description: '更新成功',
   })
   @ApiResponse({
@@ -113,7 +113,7 @@ export class RoleController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: SwaggerBaseApiResponse([createRoleDto]),
+    type: SwaggerBaseApiResponse(createRoleDto),
     description: '删除成功',
   })
   @ApiResponse({

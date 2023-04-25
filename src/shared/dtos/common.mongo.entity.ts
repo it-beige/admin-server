@@ -1,23 +1,24 @@
+import { IdDto } from 'src/shared/dtos/id.tdo'
 import {
   ObjectIdColumn,
-  ObjectID,
   CreateDateColumn,
   UpdateDateColumn,
   Column,
   Entity,
   VersionColumn,
+  ObjectID,
 } from 'typeorm'
 
 @Entity()
-export abstract class Common {
+export class Common {
   @ObjectIdColumn()
   _id: ObjectID
 
   @CreateDateColumn()
-  createdAt: string
+  createdAt: Date
 
   @UpdateDateColumn()
-  updatedAt: string
+  updatedAt: Date
 
   /* 
     @Column() 装饰器用于指定实体类中对应的列的属性，它支持多种配置，以下是一些常用的配置：
@@ -34,6 +35,7 @@ export abstract class Common {
   */
   @Column({
     default: false,
+    select: false,
   })
   isDelete: boolean
 

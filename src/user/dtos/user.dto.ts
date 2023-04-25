@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiExtraModels, ApiProperty, PartialType } from '@nestjs/swagger'
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator'
 import { IdDto } from 'src/shared/dtos/id.tdo'
 
@@ -28,3 +28,6 @@ export class CreateUserDto {
   @ApiProperty({})
   role?
 }
+
+@ApiExtraModels(CreateUserDto)
+export class UpdateUserDto extends PartialType(CreateUserDto) {}

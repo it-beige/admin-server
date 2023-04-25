@@ -8,6 +8,7 @@ import {
   RemoveSensitiveInterceptor,
   RemoveSensitiveUrls,
 } from './shared/interceptors/remove-sensitive.interceptor'
+import { RemoveTimestampInterceptor } from './shared/interceptors/remove-timestamp-interceptor'
 
 async function bootstrap() {
   // 修改运行平台
@@ -18,17 +19,22 @@ async function bootstrap() {
   app.useStaticAssets(uploadDir, {
     prefix: '/static/upload',
   })
+
   // 允许不能识别的值
   app.useGlobalPipes(
     new ValidationPipe({
       forbidUnknownValues: false,
     }),
   )
+
   // 添加全局管道
   app.useGlobalPipes(new ValidationPipe())
 
   // 使用全局拦截器处理敏感数据
-  app.useGlobalInterceptors(new RemoveSensitiveInterceptor(RemoveSensitiveUrls))
+  app.useGlobalInterceptors(
+    new RemoveSensitiveInterceptor(),
+    new RemoveTimestampInterceptor(),
+  )
 
   // 生成swagger文档
   generateDocument(app)
