@@ -7,5 +7,5 @@ export abstract class IdDto {
    */
   @IsEmpty({ message: 'id 不能为空' })
   @Matches(regPositive, { message: '请输入有效 id' })
-  readonly id: number
+  readonly _id: string
 }

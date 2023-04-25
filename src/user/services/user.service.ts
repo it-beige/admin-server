@@ -7,6 +7,7 @@ import { MongoRepository } from 'typeorm'
 import { User } from '../entities/user.mongo.entity'
 import { AppLogger } from '../../shared/logger/logger.services'
 import { PaginationParamsDto } from '../../shared/dtos/pagination-params.dto'
+import { generatePassWord, makeSalt } from '@/shared/utils/cryptogram'
 
 @Injectable()
 export class UserService {
@@ -20,6 +21,13 @@ export class UserService {
   ) {
     this.logger.setContext(new.target.name)
   }
+
+  public getPassword(password) {
+    const salt = makeSalt() // 制作密码盐
+    const hashPassword = generatePassWord(salt, password) // 加密密码
+    return { salt, hashPassword }
+  }
+
   /* 
     create: 创建并返回一个新的 User 实例。
     save: 将一个新的或者已存在的 User 实例保存到数据库中。
@@ -29,6 +37,11 @@ export class UserService {
     update: 更新数据库中一个已存在的 User 实例的属性值。
   */
   create(user) {
+    if (user.password) {
+      const { salt, hashPassword } = this.getPassword(user.password)
+      user.salt = salt
+      user.password = hashPassword
+    }
     return this.userRepository.save(user)
   }
 
@@ -53,15 +66,27 @@ export class UserService {
     })
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a 🚀#${id} user`
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`
+  async update(id: string, user: UpdateUserDto) {
+    // 去除时间戳和id
+    ;['_id', 'createdAt', 'updatedAt'].forEach((k) =>
+      Reflect.deleteProperty(user, k),
+    )
+    // 如果更新密码
+    if (user.password) {
+      const { salt, hashPassword } = this.getPassword(user.password)
+
+      user.salt = salt
+      user.password = hashPassword
+    }
+
+    return await this.userRepository.update(id, user)
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} user`
   }
 

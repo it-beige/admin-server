@@ -10,5 +10,5 @@ export const generateDocument = (app) => {
     .addBearerAuth()
     .build()
   const document = SwaggerModule.createDocument(app, options)
-  SwaggerModule.setup('/api/docs', app, document)
+  SwaggerModule.setup('/', app, document)
 }

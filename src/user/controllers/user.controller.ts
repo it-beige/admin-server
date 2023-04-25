@@ -27,11 +27,7 @@ import {
   SwaggerBaseApiResponse,
 } from '../../shared/dtos/base-api-reponse.dto'
 import { PaginationParamsDto } from '../../shared/dtos/pagination-params.dto'
-import {
-  encryptFileMD5,
-  generatePassWord,
-  makeSalt,
-} from '../../shared/utils/cryptogram'
+
 import { UploadDto } from '../dtos/upload.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 
@@ -39,12 +35,6 @@ import { FileInterceptor } from '@nestjs/platform-express'
 @ApiTags('用户管理')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  private getPassword(password) {
-    const salt = makeSalt() // 制作密码盐
-    const hashPassword = generatePassWord(salt, password) // 加密密码
-    return { salt, hashPassword }
-  }
 
   @ApiOperation({
     summary: '新增用户',
@@ -61,12 +51,6 @@ export class UserController {
   })
   @Post('')
   create(@Body() user: CreateUserDto) {
-    if (user.password) {
-      console.log(user.password)
-      const { salt, hashPassword } = this.getPassword(user.password)
-      user.salt = salt
-      user.password = hashPassword
-    }
     return this.userService.create(user)
   }
 
@@ -91,18 +75,17 @@ export class UserController {
   })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id)
+    return this.userService.findOne(id)
   }
 
   @ApiOperation({
     summary: '更新用户',
   })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() user: UpdateUserDto) {
-    const { salt, hashPassword } = this.getPassword(user.password)
-    user.salt = salt
-    user.password = hashPassword
-    return this.userService.update(+id, user)
+  async update(@Param('id') id: string, @Body() user: UpdateUserDto) {
+    return {
+      data: await this.userService.update(id, user),
+    }
   }
 
   @ApiOperation({
@@ -110,7 +93,7 @@ export class UserController {
   })
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userService.remove(+id)
+    return this.userService.remove(id)
   }
 
   @ApiOperation({

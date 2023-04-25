@@ -20,10 +20,15 @@ import {
   SwaggerBaseApiResponse,
 } from '../../shared/dtos/base-api-reponse.dto'
 import { AuthGuard } from '@nestjs/passport'
-import { RegisterCodeDTO, UserInfoDto } from '../dtos/auth.dto'
+import {
+  RegisterCodeDTO,
+  RegisterSMSDTO,
+  UserInfoDto,
+  UserInfoSuccessVO,
+} from '../dtos/auth.dto'
 
 @ApiTags('认证鉴权')
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -94,9 +99,29 @@ export class AuthController {
     status: HttpStatus.NOT_FOUND,
     type: BaseApiErrorResponse,
   })
-  @Get('catpcha')
+  @Get('captcha')
   async getCaptcha() {
     const data = await this.authService.getCaptcha()
-    return data 
+    return {
+      data,
+    }
+  }
+
+  @ApiOperation({
+    summary: '短信用户注册/登录',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: SwaggerBaseApiResponse(RegisterSMSDTO),
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    type: BaseApiErrorResponse,
+  })
+  @Post('registerBySMS')
+  async registerBySMS(
+    @Body() registerDTO: RegisterSMSDTO,
+  ): Promise<UserInfoSuccessVO> {
+    return this.authService.registerBySMS(registerDTO)
   }
 }

@@ -1,11 +1,17 @@
+import { UserService } from './user.service'
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { MongoRepository } from 'typeorm'
 import { User } from '../entities/user.mongo.entity'
 import { LoginDto } from '../dtos/login.dto'
 import { generatePassWord, makeSalt } from '../../shared/utils/cryptogram'
-import { AppLogger } from 'src/shared/logger/logger.services'
-import { RegisterCodeDTO, RegisterDTO, UserInfoDto } from '../dtos/auth.dto'
+import { AppLogger } from '@/shared/logger/logger.services'
+import {
+  RegisterCodeDTO,
+  RegisterDTO,
+  RegisterSMSDTO,
+  UserInfoDto,
+} from '../dtos/auth.dto'
 import { Role } from '../entities/role.mongo.entity'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import { Redis } from 'ioredis'
@@ -21,6 +27,7 @@ export class AuthService {
     private readonly roleRepository: MongoRepository<Role>,
     private readonly logger: AppLogger,
     @InjectRedis() private readonly redis: Redis,
+    private readonly userService: UserService,
     private readonly captchaService: CaptchaService,
   ) {}
 
@@ -33,6 +40,7 @@ export class AuthService {
     return token
   }
 
+  // 登陆校验用户信息
   async checkUserValidity(login: LoginDto) {
     const { phoneNumber, password } = login
     const user = await this.userRepository.findOneBy({ phoneNumber })
@@ -70,6 +78,74 @@ export class AuthService {
     return data
   }
 
+  /**
+   * 短信注册
+   * @param registerDTO
+   * @returns
+   */
+  async registerBySMS(registerDTO: RegisterSMSDTO): Promise<any> {
+    const { phoneNumber, smsCode } = registerDTO
+    const codeCache = await this.checkVerifyCode(phoneNumber)
+    if (codeCache !== smsCode) {
+      throw new NotFoundException('验证码错误或已过期')
+    }
+
+    let user = await this.userRepository.findOneBy({ phoneNumber })
+    // 用户不存在匿名注册
+    if (!user) {
+      const password = makeSalt(8)
+      user = await this.register({
+        phoneNumber,
+        name: `手机用户_${phoneNumber}`,
+        password,
+        passwordRepeat: password,
+      })
+    }
+
+    const token = await this.certificate(user)
+    return {
+      data: token,
+    }
+  }
+
+  /**
+   * 注册
+   * @param registerDTO
+   * @returns
+   */
+  async register(registerDTO: RegisterDTO): Promise<any> {
+    // 校验用户信息
+    await this.checkRegisterForm(registerDTO)
+
+    const { phoneNumber, password, name } = registerDTO
+    const { salt, hashPassword } = this.userService.getPassword(password)
+    const user = new User()
+    user.phoneNumber = phoneNumber
+    user.name = name
+    user.salt = salt
+    user.password = hashPassword
+
+    return await this.userRepository.save(user)
+  }
+
+  /**
+   * 校验注册信息
+   * @param registerDTO
+   */
+  async checkRegisterForm(registerDTO: RegisterDTO): Promise<any> {
+    // 校验重复密码是否一致
+    const { password, passwordRepeat, phoneNumber } = registerDTO
+    if (password !== passwordRepeat) {
+      throw new NotFoundException('两次输入的密码不一致')
+    }
+
+    // 校验手机号是否重复注册
+    const user = await this.userRepository.findOneBy({ phoneNumber })
+    if (user) {
+      throw new NotFoundException(`用户已存在,昵称${user.name}`)
+    }
+  }
+
   // 生成随机验证码
   generateCode() {
     return Array.from({ length: 4 })
@@ -78,23 +154,36 @@ export class AuthService {
   }
 
   async registerCode(register: RegisterCodeDTO) {
-    const redisStore = await this.checkVerifyCode()
+    // 验证图形验证码
+    const captchaCodeCache = await this.redis.get(
+      `captcha_${register.captchaId}`,
+    )
+    if (!captchaCodeCache) {
+      throw new NotFoundException('图形验证码已过期, 请重新生成后验证')
+    }
+    const { captchaCode, phoneNumber } = register
+    if (
+      captchaCodeCache.toLocaleLowerCase() !== captchaCode.toLocaleLowerCase()
+    ) {
+      throw new NotFoundException('图形验证码错误')
+    }
+
+    const redisStore = await this.checkVerifyCode(phoneNumber)
     if (redisStore !== null) {
-      throw new NotFoundException('验证码求过期,请勿重新发送')
+      throw new NotFoundException('验证码未过期,无需重新发送')
     }
 
     const code = this.generateCode()
-    const { phoneNumber } = register
     await this.setVerifyCode(phoneNumber, code)
     return code
   }
 
   setVerifyCode(phoneNumber, code) {
-    return this.redis.set('code', phoneNumber + code, 'EX', 60)
+    return this.redis.set(`${phoneNumber}_code`, code, 'EX', 60)
   }
 
-  checkVerifyCode() {
-    return this.redis.get('code')
+  checkVerifyCode(phoneNumber) {
+    return this.redis.get(`${phoneNumber}_code`)
   }
 
   /**

@@ -1,3 +1,4 @@
+import { SuccessVO } from '@/shared/dtos/success.dto'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNotEmpty, Matches, IsString } from 'class-validator'
 import { regMobileCN } from '@/shared/utils/regexp.util'
@@ -18,12 +19,12 @@ export class RegisterSMSDTO {
   @ApiProperty({ example: '0000' })
   readonly smsCode: string
 
-  /**
-   * 图形验证码
-   */
-  @IsNotEmpty({ message: '请输入图形验证码' })
-  @ApiProperty({ example: '0000' })
-  readonly verifyCode: string
+  // /**
+  //  * 图形验证码
+  //  */
+  // @IsNotEmpty({ message: '请输入图形验证码' })
+  // @ApiProperty({ example: '0000' })
+  // readonly verifyCode: string
 }
 
 export class RegisterCodeDTO {
@@ -158,4 +159,8 @@ export class UserInfoItem {
 
 export class UserInfoVO {
   info: UserInfoItem
+}
+
+export class UserInfoSuccessVO extends SuccessVO {
+  data: UserInfoVO
 }
