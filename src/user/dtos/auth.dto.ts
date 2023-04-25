@@ -18,13 +18,6 @@ export class RegisterSMSDTO {
   @IsNotEmpty({ message: '请输入验证码' })
   @ApiProperty({ example: '0000' })
   readonly smsCode: string
-
-  // /**
-  //  * 图形验证码
-  //  */
-  // @IsNotEmpty({ message: '请输入图形验证码' })
-  // @ApiProperty({ example: '0000' })
-  // readonly verifyCode: string
 }
 
 export class RegisterCodeDTO {
@@ -75,6 +68,31 @@ export class RegisterDTO {
   @IsNotEmpty({ message: '请再次输入密码' })
   @ApiProperty({ example: '888888' })
   readonly passwordRepeat: string
+}
+
+export class RegisterSMSPlusDTO extends RegisterDTO {
+  /**
+   * 手机号（系统唯一）
+   */
+  @Matches(regMobileCN, { message: '请输入正确手机号' })
+  @IsNotEmpty({ message: '请输入手机号' })
+  @ApiProperty({ example: '13611177420' })
+  readonly phoneNumber: string
+
+  @IsNotEmpty({ message: '请输入验证码ID' })
+  @ApiProperty({ example: 'GaBUGhJzESU=' })
+  readonly captchaId: string
+
+  @IsNotEmpty({ message: '请输入验证码' })
+  @ApiProperty({ example: '0000' })
+  readonly captchaCode: string
+
+  /**
+   * 短信验证码
+   */
+  @IsNotEmpty({ message: '请输入验证码' })
+  @ApiProperty({ example: '0000' })
+  readonly smsCode: string
 }
 
 export class UserInfoDto {

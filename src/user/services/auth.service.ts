@@ -10,7 +10,9 @@ import {
   RegisterCodeDTO,
   RegisterDTO,
   RegisterSMSDTO,
+  RegisterSMSPlusDTO,
   UserInfoDto,
+  UserInfoVO,
 } from '../dtos/auth.dto'
 import { Role } from '../entities/role.mongo.entity'
 import { InjectRedis } from '@nestjs-modules/ioredis'
@@ -91,6 +93,7 @@ export class AuthService {
     }
 
     let user = await this.userRepository.findOneBy({ phoneNumber })
+    const message = user ? '登录成功' : '注册成功'
     // 用户不存在匿名注册
     if (!user) {
       const password = makeSalt(8)
@@ -104,6 +107,35 @@ export class AuthService {
 
     const token = await this.certificate(user)
     return {
+      code: 200,
+      message,
+      data: token,
+    }
+  }
+
+  /**
+   * 用户名密码注册
+   * @param registerDTO
+   * @returns
+   */
+  async registerBySMSPlus(registerDTO: RegisterSMSPlusDTO): Promise<any> {
+    const { phoneNumber, smsCode } = registerDTO
+    const codeCache = await this.checkVerifyCode(phoneNumber)
+    if (codeCache !== smsCode) {
+      throw new NotFoundException('验证码错误或已过期')
+    }
+
+    let user = await this.userRepository.findOneBy({ phoneNumber })
+    const message = user ? '登录成功' : '注册成功'
+    // 用户不存在根据用户提供的信息注册
+    if (!user) {
+      user = await this.register(registerDTO)
+    }
+
+    const token = await this.certificate(user)
+    return {
+      code: 200,
+      message,
       data: token,
     }
   }
@@ -163,14 +195,10 @@ export class AuthService {
     }
     const { captchaCode, phoneNumber } = register
     if (
+      !captchaCode ||
       captchaCodeCache.toLocaleLowerCase() !== captchaCode.toLocaleLowerCase()
     ) {
       throw new NotFoundException('图形验证码错误')
-    }
-
-    const redisStore = await this.checkVerifyCode(phoneNumber)
-    if (redisStore !== null) {
-      throw new NotFoundException('验证码未过期,无需重新发送')
     }
 
     const code = this.generateCode()

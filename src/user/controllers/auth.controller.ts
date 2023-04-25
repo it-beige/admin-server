@@ -23,6 +23,7 @@ import { AuthGuard } from '@nestjs/passport'
 import {
   RegisterCodeDTO,
   RegisterSMSDTO,
+  RegisterSMSPlusDTO,
   UserInfoDto,
   UserInfoSuccessVO,
 } from '../dtos/auth.dto'
@@ -123,5 +124,23 @@ export class AuthController {
     @Body() registerDTO: RegisterSMSDTO,
   ): Promise<UserInfoSuccessVO> {
     return this.authService.registerBySMS(registerDTO)
+  }
+
+  @ApiOperation({
+    summary: '用户密码/验证码/注册',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: SwaggerBaseApiResponse(RegisterSMSDTO),
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    type: BaseApiErrorResponse,
+  })
+  @Post('registerByPassword')
+  async registerBySMSPlus(
+    @Body() registerDTO: RegisterSMSPlusDTO,
+  ): Promise<any> {
+    return this.authService.registerBySMSPlus(registerDTO)
   }
 }
