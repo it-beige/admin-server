@@ -1,5 +1,5 @@
 import { Column, Entity } from 'typeorm'
-import { Common } from '../../shared/dtos/common.mongo.entity'
+import { Common } from '../../shared/entities/common.mongo.entity'
 import { ObjectId } from 'mongoose'
 
 @Entity()

@@ -19,13 +19,4 @@ export const UserProviders = [
       await AppDataSource.getRepository(Role),
     inject: ['MONGODB_DATA_SOURCE'],
   },
-  {
-    provide: 'UPLOAD_REPOSITORY',
-    inject: [ConfigService],
-    useFactory: async (configService: ConfigService) => {
-      return {
-        path: configService.get('upload.path'),
-      }
-    },
-  },
 ]

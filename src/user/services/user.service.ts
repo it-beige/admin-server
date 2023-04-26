@@ -1,4 +1,4 @@
-import { UploadService } from './upload.service'
+import { UploadService } from '../../shared/upload/upload.service'
 import { Inject, Injectable } from '@nestjs/common'
 import { SharedService } from '../../shared/shared.service'
 import { ConfigService } from '@nestjs/config'

@@ -5,7 +5,6 @@ import { SharedModule } from '../shared/shared.module'
 import { UserProviders } from './user.providers'
 import { RoleController } from './controllers/role.controller'
 import { RoleService } from './services/role.service'
-import { UploadService } from './services/upload.service'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import { AuthController } from './controllers/auth.controller'
@@ -35,9 +34,8 @@ import { RedisModule } from '@nestjs-modules/ioredis'
     UserService,
     RoleService,
     AuthService,
-    UploadService,
     JwtStrategy,
   ],
-  exports: [UploadService],
+  exports: [],
 })
 export class UserModule {}

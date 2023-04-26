@@ -1,4 +1,4 @@
-import { BaseApiErrorResponse } from './../../shared/dtos/base-api-reponse.dto'
+import { BaseApiErrorResponse } from '../../shared/dtos/base-api-response.dto'
 import {
   Body,
   Controller,
@@ -14,7 +14,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   BaseApiResponse,
   SwaggerBaseApiResponse,
-} from 'src/shared/dtos/base-api-reponse.dto'
+} from '@/shared/dtos/base-api-response.dto'
 import { createRoleDto } from '../dtos/role.dto'
 import { RoleService } from '../services/role.service'
 import { PaginationParamsDto } from '../../shared/dtos/pagination-params.dto'

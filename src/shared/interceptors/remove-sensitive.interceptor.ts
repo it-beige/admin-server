@@ -74,10 +74,7 @@ export class RemoveSensitiveInterceptor implements NestInterceptor {
         continue
       }
 
-      if (
-        value &&
-        isObject(value)
-      ) {
+      if (value && isObject(value)) {
         result[key] = this.removeFields(value, ignore)
       } else {
         result[key] = value

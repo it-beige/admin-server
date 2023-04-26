@@ -3,7 +3,7 @@ import * as path from 'path'
 import { DataSource, DataSourceOptions } from 'typeorm'
 
 const databaseType: DataSourceOptions['type'] = 'mongodb'
-export const DatabaseProvides = [
+export const DatabaseProviders = [
   {
     provide: 'MONGODB_DATA_SOURCE',
     inject: [ConfigService],
@@ -21,6 +21,15 @@ export const DatabaseProvides = [
       const ds = new DataSource(dataSrouceOptions)
       await ds.initialize()
       return ds
+    },
+  },
+  {
+    provide: 'UPLOAD_REPOSITORY',
+    inject: [ConfigService],
+    useFactory: async (configService: ConfigService) => {
+      return {
+        path: configService.get('upload.path'),
+      }
     },
   },
 ]

@@ -26,7 +26,7 @@ import {
   BaseApiErrorResponse,
   BaseApiResponse,
   SwaggerBaseApiResponse,
-} from '../../shared/dtos/base-api-reponse.dto'
+} from '../../shared/dtos/base-api-response.dto'
 import { PaginationParamsDto } from '../../shared/dtos/pagination-params.dto'
 
 import { UploadDto } from '../dtos/upload.dto'

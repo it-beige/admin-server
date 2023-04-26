@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { UPLOAD_TYPE } from '../user.providers'
+import type { UPLOAD_TYPE } from '../../user/user.providers'
 import { ensureDir, outputFile } from 'fs-extra'
-import { encryptFileMD5 } from '../../shared/utils/cryptogram'
-import { getUploadDir } from '../../shared/utils/upload'
+import { encryptFileMD5 } from '../utils/cryptogram'
+import { getUploadDir } from '../utils/upload'
 
 @Injectable()
 export class UploadService {

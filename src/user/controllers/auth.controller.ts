@@ -18,7 +18,7 @@ import { AuthService } from '../services/auth.service'
 import {
   BaseApiErrorResponse,
   SwaggerBaseApiResponse,
-} from '../../shared/dtos/base-api-reponse.dto'
+} from '../../shared/dtos/base-api-response.dto'
 import { AuthGuard } from '@nestjs/passport'
 import {
   RegisterCodeDTO,
