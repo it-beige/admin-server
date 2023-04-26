@@ -1914,14 +1914,11 @@ packages:
 
   /bl/1.2.3:
     resolution: {integrity: sha512-pvcNpa0UU69UT341rO6AYy4FVAIkUHuZXRIWbq+zHnsVcRzDDjIAhGuuYoi0d//cwIwtt4pkpKycWEfjdV+vww==}
-    dependencies:
       readable-stream: 2.3.8
       safe-buffer: 5.2.1
     dev: false
 
   /bl/2.2.1:
-    resolution: {integrity: sha512-6Pesp1w0DEX1N550i/uGV/TqucVL4AM/pgThFSN/Qq9si1/DF9aIHs1BxD8V/QU0HoeHO6cQRTAuYnLPKq1e4g==}
-    dependencies:
       readable-stream: 2.3.8
       safe-buffer: 5.2.1
     dev: false
