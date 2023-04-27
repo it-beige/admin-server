@@ -22,8 +22,8 @@ export class UploadService {
     await outputFile(uploadPath, file.buffer)
 
     return {
-      path: `/${path}/${fileName}`,
-      url: uploadPath,
+      url: `/${path}/${fileName}`,
+      path: uploadPath,
     }
   }
 }

@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common'
 import { MongoRepository } from 'typeorm'
+import { ObjectID } from 'mongodb'
 import { Menu } from '../entities/menu.mongo.entity'
 import { ArticleService } from './article.service'
 import { UploadService } from '@/shared/upload/upload.service'
@@ -7,9 +8,9 @@ import { CreateMenuDto, UpdateMenuDto } from '../dtos/menu.dto'
 import { plainToClass } from 'class-transformer'
 import { UploadDto } from '@/user/dtos/upload.dto'
 import { zip } from 'compressing'
-import { existsSync, readdir } from 'fs-extra'
+import { existsSync, readdir, rm } from 'fs-extra'
 import { extname, join } from 'path'
-import { readdirSync } from 'fs'
+import { readFileSync, readdirSync, rmSync, rmdirSync } from 'fs'
 
 @Injectable()
 export class MenuService {
@@ -52,23 +53,58 @@ export class MenuService {
       .filter((i) => !ignoreDir.includes(i))
       .filter((i) => existsSync(join(root, i)))
 
+    const menus = []
     for (const category of categoryList) {
       // 导入目录(菜单)
-      await this.importCategory(category, root)
+      menus.push(await this.importCategory(category, root, ignoreDir))
     }
+
+    await this.update({ menus })
+    await rmSync(uploadPath)
+    await rm(root, { recursive: true })
   }
 
-  async importCategory(category: string, root: string) {
+  async importCategory(category: string, root: string, ignoreDir: string[]) {
     const categoryDir = (src) => join(root, category, src)
-    const articles = readdirSync(join(root, category)).filter((i) =>
-      existsSync(categoryDir(i)),
-    )
+    const articles = readdirSync(join(root, category))
+      .filter((i) => existsSync(categoryDir(i)))
+      .filter((i) => !ignoreDir.includes(i))
+    let children = []
     for (const article of articles) {
-      await this.importArticle(article, join(root, article))
+      children = children.concat(
+        await this.importArticle(article, categoryDir(article), ignoreDir),
+      )
+    }
+
+    return {
+      key: new ObjectID().toString(),
+      // 去掉序号
+      title: category,
+      type: 'category',
+      children,
     }
   }
 
-  async importArticle(title: string, articleSrc) {
-    readdirSync(articleSrc)
+  async importArticle(article: string, articleSrc, ignoreDir: string[]) {
+    const articlePaths = readdirSync(articleSrc).filter(
+      (i) => !ignoreDir.includes(i),
+    )
+
+    const saveArticles = await Promise.all(
+      articlePaths.map(async (p) => {
+        const src = join(articleSrc, p)
+        const ext = extname(src)
+        const title = p.replace(ext, '')
+        const content = readFileSync(src, 'utf-8')
+        const { _id } = await this.articleService.create({ title, content })
+        return {
+          key: _id,
+          title,
+          content,
+        }
+      }),
+    )
+
+    return saveArticles
   }
 }
