@@ -105,4 +105,46 @@ export class MenuController {
       ok: 1,
     }
   }
+
+  @ApiOperation({
+    summary: '刷新全部内容',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: SwaggerBaseApiResponse({}),
+    description: '刷新成功',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    type: BaseApiErrorResponse,
+    description: '刷新失败',
+  })
+  // @ApiBearerAuth()
+  // @UseGuards(AuthGuard('jwt'))
+  @Post('refresh')
+  async refresh() {
+    // const log = await this.spawn('pm2', ['restart', 'cms'], { cwd: './' })
+    const log = await this.spawn('ls', ['-l'], { cwd: './' })
+
+    return {
+      ok: 1,
+      log,
+    }
+  }
+
+  async spawn(...args) {
+    const { spawn } = require('child_process')
+    return new Promise((resolve) => {
+      const proc = spawn(...args)
+      proc.stdout.pipe(process.stdout)
+      proc.stderr.pipe(process.stderr)
+      let ret = ''
+      proc.stdout.on('data', (data) => {
+        ret += data.toString()
+      })
+      proc.on('close', () => {
+        resolve(ret)
+      })
+    })
+  }
 }

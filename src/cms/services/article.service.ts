@@ -6,6 +6,7 @@ import {
   PaginationParamsDto,
 } from '../../shared/dtos/pagination-params.dto'
 import { CreateArticleDto, UpdateArticleDto } from '../dtos/article.dto'
+import axios from 'axios'
 
 @Injectable()
 export class ArticleService {
@@ -48,6 +49,27 @@ export class ArticleService {
     // TODO 暂时使用同步刷新
     // await this.sync(id)
     return ret
+  }
+
+  /**
+   * 同步文章
+   * @param id
+   */
+  async sync(id: string) {
+    const secret = process.env.NEST_VALIDATE_TOKEN
+    // const host = 'http://localhost:3001'
+    const host = process.env.NEXT_HOST
+    const url = `api/revalidate?secret=${secret}&id=${id}`
+    console.log('sync nest validate url:', host + '/' + url)
+    try {
+      await axios.get(host + '/' + url)
+    } catch (error) {
+      // console.log(error)
+      console.log('同步失败')
+    }
+    console.log('同步成功')
+
+    return
   }
 
   async remove(id: string): Promise<any> {
