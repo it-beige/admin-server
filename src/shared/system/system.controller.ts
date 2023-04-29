@@ -1,6 +1,7 @@
-import { BaseApiErrorResponse } from './../dtos/base-api-response.dto'
+import { BaseApiErrorResponse } from '../dtos/base-api-response.dto'
 import {
   Body,
+  Controller,
   Get,
   HttpStatus,
   Injectable,
@@ -20,7 +21,7 @@ import { BackupDto } from '../dtos/backup.dto'
 import * as moment from 'moment'
 
 @ApiTags('系统维护')
-@Injectable()
+@Controller()
 export class SystemController {
   constructor() {}
 

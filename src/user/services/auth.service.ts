@@ -64,7 +64,7 @@ export class AuthService {
     const user = await this.checkUserValidity(login)
     const token = await this.certificate(user)
     return {
-      data: token,
+      data: { token },
     }
   }
 
