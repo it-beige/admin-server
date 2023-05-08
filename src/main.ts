@@ -7,6 +7,7 @@ import { getUploadDir } from './shared/utils/upload'
 import { RemoveSensitiveInterceptor } from './shared/interceptors/remove-sensitive.interceptor'
 import { RemoveTimestampInterceptor } from './shared/interceptors/remove-timestamp-interceptor'
 import helmet from 'helmet'
+import { rateLimit } from 'express-rate-limit'
 
 async function bootstrap() {
   // 修改运行平台
@@ -14,6 +15,14 @@ async function bootstrap() {
 
   // 安全防御
   app.use(helmet({}))
+
+  // 请求频次控制
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // limit each IP to 100 requests per windowMs
+    }),
+  )
 
   // app.use(helmet({
   //   contentSecurityPolicy: {
