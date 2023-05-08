@@ -4,15 +4,28 @@ import { generateDocument } from './doc'
 import { ValidationPipe } from '@nestjs/common'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { getUploadDir } from './shared/utils/upload'
-import {
-  RemoveSensitiveInterceptor,
-  RemoveSensitiveUrls,
-} from './shared/interceptors/remove-sensitive.interceptor'
+import { RemoveSensitiveInterceptor } from './shared/interceptors/remove-sensitive.interceptor'
 import { RemoveTimestampInterceptor } from './shared/interceptors/remove-timestamp-interceptor'
+import helmet from 'helmet'
 
 async function bootstrap() {
   // 修改运行平台
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
+
+  // 安全防御
+  app.use(helmet({}))
+
+  // app.use(helmet({
+  //   contentSecurityPolicy: {
+  //     directives: {
+  //       defaultSrc: [`'self'`],
+  //       styleSrc: [`'self'`, `'unsafe-inline'`, 'cdn.jsdelivr.net', 'fonts.googleapis.com'],
+  //       fontSrc: [`'self'`, 'fonts.gstatic.com'],
+  //       imgSrc: [`'self'`, 'data:', 'cdn.jsdelivr.net'],
+  //       scriptSrc: [`'self'`, `https: 'unsafe-inline'`, `cdn.jsdelivr.net`],
+  //     },
+  //   }
+  // }))
 
   // 静态服务
   const uploadDir = getUploadDir(process.env.UPLOAD_PATH)
