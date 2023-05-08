@@ -41,9 +41,7 @@ export const RemoveSensitiveUrls = ['/info']
 // }
 
 export class RemoveSensitiveInterceptor implements NestInterceptor {
-  constructor(
-    private readonly ignoredFields: string[] = ['password', 'salt'],
-  ) {}
+  constructor(readonly ignoredFields: string[] = ['password', 'salt']) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest()
@@ -66,7 +64,7 @@ export class RemoveSensitiveInterceptor implements NestInterceptor {
     )
   }
 
-  private removeFields(data: any, ignore: (key: string) => boolean) {
+  removeFields(data: any, ignore: (key: string) => boolean) {
     const result: any = {}
 
     for (const [key, value] of Object.entries(data)) {
